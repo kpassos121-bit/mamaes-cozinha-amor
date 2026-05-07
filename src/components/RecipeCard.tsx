@@ -1,8 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import type { Recipe } from "@/data/recipes";
-import { Clock, Users, ChefHat, ArrowUpRight } from "lucide-react";
+import { Clock, Users, ChefHat, ArrowUpRight, Heart } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
+import type { MouseEvent } from "react";
 
 export function RecipeCard({ recipe, index }: { recipe: Recipe; index: number }) {
+  const { isFavorite, toggle } = useFavorites();
+  const fav = isFavorite(recipe.id);
+
+  const onFav = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggle(recipe.id);
+  };
+
   return (
     <Link
       to="/receita/$id"
@@ -14,6 +25,15 @@ export function RecipeCard({ recipe, index }: { recipe: Recipe; index: number })
         className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-30 blur-3xl transition-all duration-700 group-hover:opacity-60 group-hover:scale-125"
         style={{ background: recipe.color }}
       />
+      <button
+        onClick={onFav}
+        aria-label={fav ? "Remover dos favoritos" : "Favoritar"}
+        className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-110 ${
+          fav ? "bg-primary text-primary-foreground" : "bg-background/70 text-foreground"
+        }`}
+      >
+        <Heart className={`h-4 w-4 ${fav ? "fill-current" : ""}`} />
+      </button>
       <div className="relative flex flex-col gap-5">
         <div className="flex items-start justify-between">
           <div
