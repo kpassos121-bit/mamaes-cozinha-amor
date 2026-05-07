@@ -170,6 +170,9 @@ function Index() {
         </div>
       </section>
 
+      <MessageWall />
+      <CommunityRecipes />
+
       {/* Letter */}
       <section id="carta" className="relative overflow-hidden bg-foreground py-32 text-background">
         <div
