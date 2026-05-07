@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { recipes } from "@/data/recipes";
+import { recipes, type Recipe } from "@/data/recipes";
 import { ArrowLeft, Clock, Users, ChefHat, Heart, Check, Printer } from "lucide-react";
 
 export const Route = createFileRoute("/receita/$id")({
@@ -101,7 +101,7 @@ function RecipePage() {
             </span>
           </div>
           <ul className="mt-6 space-y-2">
-            {recipe.ingredients.map((ing, i) => (
+            {recipe.ingredients.map((ing: Recipe["ingredients"][number], i: number) => (
               <li key={i}>
                 <button
                   onClick={() => setChecked({ ...checked, [i]: !checked[i] })}
@@ -152,7 +152,7 @@ function RecipePage() {
           </div>
 
           <ol className="space-y-4">
-            {recipe.steps.map((step, i) => {
+            {recipe.steps.map((step: string, i: number) => {
               const done = doneSteps[i];
               return (
                 <li key={i}>
