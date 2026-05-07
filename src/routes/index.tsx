@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { recipes } from "@/data/recipes";
 import { RecipeCard } from "@/components/RecipeCard";
+import { MessageWall } from "@/components/MessageWall";
+import { CommunityRecipes } from "@/components/CommunityRecipes";
 import { Heart, Sparkles, BookHeart, Flower2 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
