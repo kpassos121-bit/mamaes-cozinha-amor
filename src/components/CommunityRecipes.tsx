@@ -1,8 +1,18 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
-import { Plus, ChefHat, Sparkles } from "lucide-react";
+import { Plus, ChefHat, Sparkles, Pencil, X } from "lucide-react";
 
 type CommunityRecipe = {
   id: string;
@@ -11,14 +21,18 @@ type CommunityRecipe = {
   story: string;
   ingredients: string;
   steps: string;
+  userId?: string;
   createdAt?: { toMillis: () => number } | null;
 };
+
+const emptyForm = { title: "", author: "", story: "", ingredients: "", steps: "" };
 
 export function CommunityRecipes() {
   const { user } = useAuth();
   const [recipes, setRecipes] = useState<CommunityRecipe[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", author: "", story: "", ingredients: "", steps: "" });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,26 +49,56 @@ export function CommunityRecipes() {
     return unsub;
   }, []);
 
+  const startEdit = (r: CommunityRecipe) => {
+    setEditingId(r.id);
+    setForm({
+      title: r.title,
+      author: r.author,
+      story: r.story,
+      ingredients: r.ingredients,
+      steps: r.steps,
+    });
+    setOpen(true);
+    setTimeout(() => document.getElementById("comunidade-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(false);
+  };
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setSending(true);
     setError(null);
     try {
-      await addDoc(collection(db, "communityRecipes"), {
+      const payload = {
         title: form.title.trim().slice(0, 100),
         author: form.author.trim().slice(0, 60),
         story: form.story.trim().slice(0, 500),
         ingredients: form.ingredients.trim().slice(0, 1500),
         steps: form.steps.trim().slice(0, 2500),
-        userId: user.uid,
-        createdAt: serverTimestamp(),
-      });
-      setForm({ title: "", author: "", story: "", ingredients: "", steps: "" });
+      };
+      if (editingId) {
+        await updateDoc(doc(db, "communityRecipes", editingId), {
+          ...payload,
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        await addDoc(collection(db, "communityRecipes"), {
+          ...payload,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setForm(emptyForm);
+      setEditingId(null);
       setOpen(false);
     } catch (err) {
       console.error("Submit recipe error:", err);
-      setError("Erro ao enviar a receita. Verifique as regras do Firestore.");
+      setError("Erro ao salvar a receita. Verifique as regras do Firestore.");
     } finally {
       setSending(false);
     }
@@ -69,19 +113,22 @@ export function CommunityRecipes() {
             As receitas <em className="italic text-gradient-warm">de vocês</em>.
           </h2>
           <p className="mt-4 max-w-xl text-foreground/70">
-            Compartilhe a receita preferida da sua mãe. Outras pessoas também poderão se inspirar.
+            Compartilhe a receita preferida da sua mãe. Você pode editar suas próprias receitas a qualquer momento.
           </p>
         </div>
         <button
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => (open ? cancelEdit() : setOpen(true))}
           className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background shadow-warm transition hover:scale-105"
         >
-          <Plus className="h-4 w-4" /> {open ? "Fechar" : "Adicionar receita"}
+          {open ? <><X className="h-4 w-4" /> Fechar</> : <><Plus className="h-4 w-4" /> Adicionar receita</>}
         </button>
       </div>
 
       {open && (
-        <form onSubmit={submit} className="mt-10 grid gap-4 rounded-3xl border border-border bg-gradient-card p-6 shadow-soft sm:p-8">
+        <form id="comunidade-form" onSubmit={submit} className="mt-10 grid gap-4 rounded-3xl border border-border bg-gradient-card p-6 shadow-soft sm:p-8">
+          {editingId && (
+            <p className="text-xs font-medium uppercase tracking-widest text-primary">Editando receita</p>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <input required maxLength={100} placeholder="Nome da receita" value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -99,10 +146,18 @@ export function CommunityRecipes() {
           <textarea required maxLength={2500} rows={5} placeholder="Modo de preparo (um passo por linha)" value={form.steps}
             onChange={(e) => setForm({ ...form, steps: e.target.value })}
             className="rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary" />
-          <button type="submit" disabled={sending || !user}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background shadow-warm transition hover:scale-105 disabled:opacity-50">
-            <Sparkles className="h-4 w-4" /> {sending ? "Enviando..." : "Publicar receita"}
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button type="submit" disabled={sending || !user}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background shadow-warm transition hover:scale-105 disabled:opacity-50">
+              <Sparkles className="h-4 w-4" /> {sending ? "Salvando..." : editingId ? "Salvar alterações" : "Publicar receita"}
+            </button>
+            {editingId && (
+              <button type="button" onClick={cancelEdit}
+                className="inline-flex items-center gap-2 rounded-full border border-foreground/30 px-6 py-3 text-sm font-medium transition hover:bg-foreground/5">
+                Cancelar
+              </button>
+            )}
+          </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
         </form>
       )}
@@ -114,27 +169,41 @@ export function CommunityRecipes() {
             Nenhuma receita ainda. Seja o primeiro a contribuir!
           </div>
         )}
-        {recipes.map((r) => (
-          <article key={r.id} className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-warm">
-            <ChefHat className="h-6 w-6 text-primary" />
-            <h3 className="mt-3 font-display text-2xl font-semibold">{r.title}</h3>
-            <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">por {r.author}</p>
-            <p className="mt-3 text-sm italic text-muted-foreground line-clamp-3">"{r.story}"</p>
-            <details className="mt-4">
-              <summary className="cursor-pointer text-sm font-medium text-primary">Ver receita</summary>
-              <div className="mt-3 space-y-3 text-sm">
-                <div>
-                  <h4 className="font-semibold">Ingredientes</h4>
-                  <pre className="whitespace-pre-wrap font-sans text-foreground/80">{r.ingredients}</pre>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Modo de preparo</h4>
-                  <pre className="whitespace-pre-wrap font-sans text-foreground/80">{r.steps}</pre>
-                </div>
+        {recipes.map((r) => {
+          const canEdit = !!user && r.userId === user.uid;
+          return (
+            <article key={r.id} className="relative rounded-3xl border border-border/60 bg-card p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-warm">
+              <div className="flex items-start justify-between gap-3">
+                <ChefHat className="h-6 w-6 text-primary" />
+                {canEdit && (
+                  <button
+                    onClick={() => startEdit(r)}
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground transition hover:border-foreground/40"
+                    aria-label="Editar receita"
+                  >
+                    <Pencil className="h-3 w-3" /> Editar
+                  </button>
+                )}
               </div>
-            </details>
-          </article>
-        ))}
+              <h3 className="mt-3 font-display text-2xl font-semibold">{r.title}</h3>
+              <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">por {r.author}</p>
+              <p className="mt-3 text-sm italic text-muted-foreground line-clamp-3">"{r.story}"</p>
+              <details className="mt-4">
+                <summary className="cursor-pointer text-sm font-medium text-primary">Ver receita</summary>
+                <div className="mt-3 space-y-3 text-sm">
+                  <div>
+                    <h4 className="font-semibold">Ingredientes</h4>
+                    <pre className="whitespace-pre-wrap font-sans text-foreground/80">{r.ingredients}</pre>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Modo de preparo</h4>
+                    <pre className="whitespace-pre-wrap font-sans text-foreground/80">{r.steps}</pre>
+                  </div>
+                </div>
+              </details>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
