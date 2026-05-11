@@ -13,6 +13,27 @@ type Meal = {
 
 const ENDPOINT = "https://www.themealdb.com/api/json/v1/1/random.php";
 
+const AREA_PT: Record<string, string> = {
+  American: "Americana", British: "Britânica", Canadian: "Canadense", Chinese: "Chinesa",
+  Croatian: "Croata", Dutch: "Holandesa", Egyptian: "Egípcia", Filipino: "Filipina",
+  French: "Francesa", Greek: "Grega", Indian: "Indiana", Irish: "Irlandesa",
+  Italian: "Italiana", Jamaican: "Jamaicana", Japanese: "Japonesa", Kenyan: "Queniana",
+  Malaysian: "Malaia", Mexican: "Mexicana", Moroccan: "Marroquina", Polish: "Polonesa",
+  Portuguese: "Portuguesa", Russian: "Russa", Spanish: "Espanhola", Thai: "Tailandesa",
+  Tunisian: "Tunisiana", Turkish: "Turca", Ukrainian: "Ucraniana", Vietnamese: "Vietnamita",
+  Unknown: "Internacional",
+};
+
+const CATEGORY_PT: Record<string, string> = {
+  Beef: "Carne bovina", Chicken: "Frango", Dessert: "Sobremesa", Lamb: "Cordeiro",
+  Miscellaneous: "Diversos", Pasta: "Massa", Pork: "Suíno", Seafood: "Frutos do mar",
+  Side: "Acompanhamento", Starter: "Entrada", Vegan: "Vegano", Vegetarian: "Vegetariano",
+  Breakfast: "Café da manhã", Goat: "Cabrito",
+};
+
+const ptArea = (a: string) => AREA_PT[a] ?? a;
+const ptCategory = (c: string) => CATEGORY_PT[c] ?? c;
+
 async function fetchMeals(count: number): Promise<Meal[]> {
   const reqs = Array.from({ length: count }, () => fetch(ENDPOINT).then((r) => r.json()));
   const results = await Promise.all(reqs);
@@ -93,12 +114,12 @@ export function WorldRecipes() {
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
               <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-background/90 px-3 py-1 text-xs font-medium backdrop-blur">
-                <Globe2 className="h-3 w-3" /> {m.strArea}
+                <Globe2 className="h-3 w-3" /> {ptArea(m.strArea)}
               </span>
             </div>
             <div className="p-6">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                {m.strCategory}
+                {ptCategory(m.strCategory)}
               </p>
               <h3 className="mt-2 font-display text-2xl font-semibold leading-tight">
                 {m.strMeal}
@@ -113,7 +134,7 @@ export function WorldRecipes() {
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                 >
-                  Ver vídeo <ExternalLink className="h-3.5 w-3.5" />
+                  Ver vídeo (em inglês) <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               )}
             </div>
