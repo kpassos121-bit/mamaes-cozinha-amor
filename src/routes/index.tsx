@@ -4,6 +4,7 @@ import { recipes } from "@/data/recipes";
 import { RecipeCard } from "@/components/RecipeCard";
 import { MessageWall } from "@/components/MessageWall";
 import { CommunityRecipes } from "@/components/CommunityRecipes";
+import { WorldRecipes } from "@/components/WorldRecipes";
 import { Heart, Sparkles, BookHeart, Flower2 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -170,6 +171,7 @@ function Index() {
         </div>
       </section>
 
+      <WorldRecipes />
       <MessageWall />
       <CommunityRecipes />
 
