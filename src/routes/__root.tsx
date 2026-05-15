@@ -72,18 +72,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "A digital cookbook celebrating mothers with interactive recipes and a modern interface." },
+      { title: "A História da Copa do Mundo" },
+      { name: "description", content: "Documentário interativo sobre a Copa do Mundo FIFA — de 1930 a 2022." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "A digital cookbook celebrating mothers with interactive recipes and a modern interface." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "A digital cookbook celebrating mothers with interactive recipes and a modern interface." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cf46b776-5f62-463d-877d-8542e5680c9c/id-preview-534a5970--f7074888-5a62-4e49-995f-774c0f7f26ed.lovable.app-1778154415183.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cf46b776-5f62-463d-877d-8542e5680c9c/id-preview-534a5970--f7074888-5a62-4e49-995f-774c0f7f26ed.lovable.app-1778154415183.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {

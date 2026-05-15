@@ -1,210 +1,168 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { recipes } from "@/data/recipes";
-import { RecipeCard } from "@/components/RecipeCard";
-import { MessageWall } from "@/components/MessageWall";
-import { CommunityRecipes } from "@/components/CommunityRecipes";
-import { WorldRecipes } from "@/components/WorldRecipes";
-import { Heart, Sparkles, BookHeart, Flower2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronDown, Trophy, Globe, Flame } from "lucide-react";
+import { Particles, Reveal } from "@/components/visual";
+import { Timeline } from "@/components/Timeline";
+import { Legends, Moments } from "@/components/LegendsAndMoments";
+import { Stats } from "@/components/Stats";
+import { Quiz } from "@/components/Quiz";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Receitas com Amor — Livro de Receitas para o Dia das Mães" },
-      { name: "description", content: "Um livro de receitas interativo e moderno para celebrar as mães. Bolos, doces, pratos e bebidas feitos com carinho." },
-      { property: "og:title", content: "Receitas com Amor — Dia das Mães" },
-      { property: "og:description", content: "Receitas afetivas para celebrar a mulher mais especial da sua vida." },
+      { title: "A História da Copa do Mundo — Documentário Interativo" },
+      {
+        name: "description",
+        content:
+          "Uma jornada cinematográfica pelos maiores momentos da Copa do Mundo FIFA, de 1930 a 2022. Lendas, estatísticas e memórias eternas.",
+      },
+      { property: "og:title", content: "A História da Copa do Mundo" },
+      {
+        property: "og:description",
+        content: "De Uruguai 1930 a Catar 2022 — todas as Copas, lendas e momentos inesquecíveis.",
+      },
     ],
   }),
   component: Index,
 });
 
-const categories = ["Tudo", "Doce", "Salgado", "Bebida", "Café da manhã"] as const;
-
 function Index() {
-  const [active, setActive] = useState<(typeof categories)[number]>("Tudo");
-
-  const filtered = useMemo(
-    () => (active === "Tudo" ? recipes : recipes.filter((r) => r.category === active)),
-    [active],
-  );
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero opacity-90" />
-        <div
-          className="absolute -left-32 top-20 h-96 w-96 rounded-full opacity-50 blur-3xl animate-float"
-          style={{ background: "var(--rose)" }}
-        />
-        <div
-          className="absolute -right-20 bottom-0 h-80 w-80 rounded-full opacity-40 blur-3xl animate-float"
-          style={{ background: "var(--gold)", animationDelay: "2s" }}
-        />
+    <div className="min-h-screen overflow-x-hidden">
+      <Hero />
+      <Timeline />
+      <Legends />
+      <Moments />
+      <Stats />
+      <Quiz />
+      <Footer />
+    </div>
+  );
+}
 
-        <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
-              <BookHeart className="h-5 w-5" />
-            </div>
-            <span className="font-display text-xl font-semibold">Cozinha da Mãe</span>
+function Hero() {
+  return (
+    <header className="relative isolate min-h-screen overflow-hidden bg-gradient-hero">
+      <div className="pitch-lines absolute inset-0 opacity-30" />
+      <Particles count={50} />
+
+      {/* glowing orbs */}
+      <div
+        className="pointer-events-none absolute -left-40 top-20 h-[500px] w-[500px] rounded-full opacity-50 blur-3xl animate-float-slow"
+        style={{ background: "radial-gradient(circle, var(--pitch) 0%, transparent 70%)" }}
+      />
+      <div
+        className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full opacity-40 blur-3xl animate-float-slow"
+        style={{
+          background: "radial-gradient(circle, var(--gold) 0%, transparent 70%)",
+          animationDelay: "3s",
+        }}
+      />
+
+      <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-gold shadow-glow">
+            <Trophy className="h-5 w-5 text-[var(--ink)]" />
           </div>
-          <div className="hidden items-center gap-6 text-sm font-medium text-foreground/80 sm:flex">
-            <a href="#receitas" className="hover:text-foreground">Receitas</a>
-            <a href="#carta" className="hover:text-foreground">A carta</a>
-            <span className="flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-background">
-              <Heart className="h-3.5 w-3.5 fill-current" /> Dia das Mães
-            </span>
-          </div>
-        </nav>
-
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-32 pt-16 sm:pt-24">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-foreground/20 bg-background/40 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-foreground backdrop-blur-md">
-                <Sparkles className="h-3.5 w-3.5" /> Edição Especial • 2026
-              </span>
-              <h1 className="mt-6 font-display text-6xl font-light leading-[0.95] text-foreground sm:text-7xl lg:text-8xl">
-                Receitas <em className="italic text-gradient-warm">com</em>
-                <br />
-                amor de mãe.
-              </h1>
-              <p className="mt-6 max-w-lg text-lg leading-relaxed text-foreground/70">
-                Um livro vivo, feito de memórias, cheiros de cozinha e abraços apertados. Cada receita aqui é uma carta de amor às mulheres que nos ensinaram que comida é cuidado.
-              </p>
-              <div className="mt-10 flex flex-wrap items-center gap-4">
-                <a
-                  href="#receitas"
-                  className="group inline-flex items-center gap-2 rounded-full bg-foreground px-7 py-4 text-sm font-medium text-background shadow-warm transition-all hover:scale-105"
-                >
-                  Explorar receitas
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
-                </a>
-                <a
-                  href="#carta"
-                  className="inline-flex items-center gap-2 rounded-full border border-foreground/30 px-7 py-4 text-sm font-medium text-foreground transition-all hover:bg-foreground/5"
-                >
-                  Ler a dedicatória
-                </a>
-              </div>
-
-              <div className="mt-12 flex items-center gap-8">
-                {[
-                  { n: "06", l: "Receitas" },
-                  { n: "∞", l: "Memórias" },
-                  { n: "01", l: "Mãe especial" },
-                ].map((s) => (
-                  <div key={s.l}>
-                    <div className="font-display text-4xl font-semibold text-foreground">{s.n}</div>
-                    <div className="text-xs uppercase tracking-wider text-foreground/60">{s.l}</div>
-                  </div>
-                ))}
-              </div>
+          <div>
+            <div className="font-display text-xl tracking-widest text-foreground">FIFA WORLD CUP</div>
+            <div className="-mt-1 text-[10px] uppercase tracking-[0.3em] text-[var(--gold)]">
+              1930 — 2022
             </div>
+          </div>
+        </div>
+        <div className="hidden items-center gap-7 text-xs font-semibold uppercase tracking-widest text-foreground/70 md:flex">
+          <a href="#historia" className="transition-colors hover:text-[var(--gold)]">Linha do tempo</a>
+          <a href="#lendas" className="transition-colors hover:text-[var(--gold)]">Lendas</a>
+          <a href="#momentos" className="transition-colors hover:text-[var(--gold)]">Momentos</a>
+          <a href="#estatisticas" className="transition-colors hover:text-[var(--gold)]">Stats</a>
+          <a href="#quiz" className="transition-colors hover:text-[var(--gold)]">Quiz</a>
+        </div>
+      </nav>
 
-            <div className="relative hidden lg:block">
-              <div className="relative aspect-[4/5] w-full">
-                <div className="absolute inset-0 rotate-6 rounded-[3rem] bg-gradient-warm shadow-warm" />
-                <div className="absolute inset-0 -rotate-3 overflow-hidden rounded-[3rem] bg-card p-10 shadow-soft">
-                  <div className="flex h-full flex-col justify-between">
-                    <div>
-                      <Flower2 className="h-10 w-10 text-primary" />
-                      <p className="mt-6 font-display text-4xl italic leading-tight text-foreground">
-                        "Mãe é a primeira casa que a gente conhece."
-                      </p>
-                    </div>
-                    <div className="space-y-4">
-                      {recipes.slice(0, 3).map((r) => (
-                        <div key={r.id} className="flex items-center gap-4 rounded-2xl bg-muted/60 p-3">
-                          <div
-                            className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-                            style={{ background: `color-mix(in oklab, ${r.color} 30%, white)` }}
-                          >
-                            {r.emoji}
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-sm font-semibold">{r.title}</div>
-                            <div className="text-xs text-muted-foreground">{r.time} • {r.difficulty}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] max-w-7xl flex-col items-center justify-center px-6 pb-20 text-center">
+        <Reveal y={20}>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--gold)]/40 bg-black/30 px-5 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-[var(--gold)] backdrop-blur">
+            <Flame className="h-3 w-3" /> Documentário Interativo
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <h1 className="mt-8 font-display text-7xl leading-[0.9] text-foreground text-shadow-glow sm:text-8xl md:text-[10rem] lg:text-[12rem]">
+            A HISTÓRIA<br />
+            <span className="text-gradient-gold">DA COPA</span>
+          </h1>
+        </Reveal>
+
+        <Reveal delay={0.25}>
+          <p className="mt-8 max-w-2xl font-serif text-xl italic leading-relaxed text-foreground/80 sm:text-2xl">
+            Uma jornada pelos maiores momentos do futebol mundial — de Uruguai 1930 à coroação de Messi no Catar.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.4}>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#historia"
+              className="group inline-flex items-center gap-3 rounded-full bg-gradient-gold px-8 py-4 text-sm font-bold uppercase tracking-widest text-[var(--ink)] shadow-glow transition-transform hover:scale-105"
+            >
+              <Globe className="h-4 w-4" />
+              Explorar História
+              <span className="transition-transform group-hover:translate-x-1">→</span>
+            </a>
+            <a
+              href="#quiz"
+              className="inline-flex items-center gap-2 rounded-full border border-foreground/20 bg-black/20 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground backdrop-blur transition-colors hover:border-[var(--gold)]/60"
+            >
+              Fazer o Quiz
+            </a>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.6}>
+          <div className="mt-20 grid grid-cols-3 gap-10 sm:gap-20">
+            {[
+              { n: "22", l: "Edições" },
+              { n: "08", l: "Campeões" },
+              { n: "∞", l: "Memórias" },
+            ].map((s) => (
+              <div key={s.l} className="text-center">
+                <div className="font-display text-5xl text-gradient-gold sm:text-6xl">{s.n}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-foreground/60">
+                  {s.l}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Recipes */}
-      <section id="receitas" className="relative mx-auto max-w-7xl px-6 py-24">
-        <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
-          <div>
-            <span className="text-sm font-medium uppercase tracking-widest text-primary">O cardápio</span>
-            <h2 className="mt-3 font-display text-5xl font-light leading-tight sm:text-6xl">
-              Cada prato, <em className="italic text-gradient-warm">uma história</em>.
-            </h2>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setActive(c)}
-                className={`rounded-full border px-5 py-2 text-sm font-medium transition-all ${
-                  active === c
-                    ? "border-foreground bg-foreground text-background shadow-soft"
-                    : "border-border bg-card text-foreground hover:border-foreground/40"
-                }`}
-              >
-                {c}
-              </button>
             ))}
           </div>
+        </Reveal>
+
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute bottom-8 text-foreground/50"
+        >
+          <ChevronDown className="h-6 w-6" />
+        </motion.div>
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="relative border-t border-white/10 bg-black/40 py-12">
+      <div className="mx-auto max-w-7xl px-6 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-gold shadow-glow">
+          <Trophy className="h-5 w-5 text-[var(--ink)]" />
         </div>
-
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((r, i) => (
-            <RecipeCard key={r.id} recipe={r} index={i} />
-          ))}
-        </div>
-      </section>
-
-      <WorldRecipes />
-      <MessageWall />
-      <CommunityRecipes />
-
-      {/* Letter */}
-      <section id="carta" className="relative overflow-hidden bg-foreground py-32 text-background">
-        <div
-          className="absolute -left-20 top-0 h-96 w-96 rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--accent)" }}
-        />
-        <div
-          className="absolute -right-20 bottom-0 h-96 w-96 rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--primary)" }}
-        />
-        <div className="relative mx-auto max-w-3xl px-6 text-center">
-          <Heart className="mx-auto h-10 w-10 fill-current text-primary" />
-          <h2 className="mt-8 font-display text-5xl font-light italic leading-tight sm:text-6xl">
-            Para você, mãe.
-          </h2>
-          <p className="mt-8 text-lg leading-relaxed text-background/80">
-            Obrigado pelos almoços de domingo, pelos lanches da tarde, pelo café passado na hora e pelos doces escondidos na lata. Obrigado por temperar tudo com amor — até as receitas mais simples viraram inesquecíveis nas suas mãos.
-          </p>
-          <p className="mt-6 font-display text-2xl italic text-background/90">
-            Este livro é nosso jeito de devolver, em receitas, um pouquinho do que você sempre serviu: cuidado.
-          </p>
-          <p className="mt-10 text-sm uppercase tracking-[0.3em] text-background/60">
-            Com todo amor • Feliz Dia das Mães
-          </p>
-        </div>
-      </section>
-
-      <footer className="border-t border-border bg-background py-10 text-center text-sm text-muted-foreground">
-        Feito com <Heart className="inline h-3.5 w-3.5 fill-primary text-primary" /> para a mulher mais especial do mundo.
-      </footer>
-    </div>
+        <p className="mt-4 font-serif text-lg italic text-foreground/80">
+          "O futebol é a coisa mais importante entre as coisas menos importantes da vida."
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">— Arrigo Sacchi</p>
+        <p className="mt-8 text-xs uppercase tracking-[0.4em] text-[var(--gold)]/70">
+          Feito com paixão pelo futebol mundial
+        </p>
+      </div>
+    </footer>
   );
 }
